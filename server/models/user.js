@@ -18,6 +18,9 @@ module.exports = (sequelize, DataTypes) => {
       email: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: {
+          msg: "Email must be unique",
+        },
         validate: {
           isEmail: {
             msg: "Invalid email format",
@@ -51,6 +54,10 @@ module.exports = (sequelize, DataTypes) => {
           },
           notEmpty: {
             msg: "Password is required",
+          },
+          len: {
+            args: [5],
+            msg: "Password need at least 5 character",
           },
         },
       },

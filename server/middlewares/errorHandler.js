@@ -1,0 +1,28 @@
+const errorHandler = async (error, req, res, next) => {
+  console.log(error.name);
+
+  switch (error.name) {
+    case "SequelizeValidationError":
+    case "SequelizeUniqueConstraintError":
+      res.status(400).json({ message: error.errors[0].message });
+      break;
+    case "Unauthorized":
+      res.status(401).json({ name: "Unauthorized", message: error.message });
+      break;
+    case "Not Found":
+      res.status(403).json({ name: "Not Found", message: error.message });
+      break;
+    case "JsonWebTokenError":
+      res.status(400).json({ message: "Invalid token" });
+      break;
+    case "Forbidden":
+      res.status(403).json({ name: "Forbidden", message: error.message });
+      break;
+
+    default:
+      res.status(500).json({ message: "Internal Server Error" });
+      break;
+  }
+};
+
+module.exports = errorHandler;
