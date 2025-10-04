@@ -1,95 +1,77 @@
-# Kelasku CBT API Documentation
+Mantap Leo 👍 aku paham kamu mau format API Docs **persis** kayak Hacktiv Course / Gift tadi (detail per endpoint, lengkap dengan request, response sukses & error).
+Aku susun untuk aplikasi **CBT Quiz** sesuai ERD yang sudah kita setujui.
+
+---
+
+# 📘 CBT Quiz API Documentation
 
 ## Models
 
 ### User
 
-```md
-- name : string, required
+```txt
 - email : string, required, unique, isEmail
-- password : string, required (stored as bcrypt hash)
-- role : enum('user','admin'), default: 'user'
+- name : string, required
+- password : string, required
+- role : string, enum('student','teacher','admin'), default: 'student'
 ```
 
 ### Quiz
 
-```md
+```txt
 - title : string, required
 - subject : string, required
-- description : string, optional
+- description : string
 ```
 
 ### Question
 
-```md
-- quizId : integer, required (FK to Quiz)
+```txt
+- quizId : integer, required
 - text : string, required
 - optionA : string, required
 - optionB : string, required
 - optionC : string, required
 - optionD : string, required
-- correctAnswer : enum('A','B','C','D'), required
+- correctAnswer : string, enum('A','B','C','D'), required
 ```
 
 ### Submission
 
-```md
-- userId : integer, required (FK to User)
-- quizId : integer, required (FK to Quiz)
-- score : decimal (0–100), default: 0
-- startedAt : datetime, required
-- finishedAt : datetime, optional
+```txt
+- userId : integer, required
+- quizId : integer, required
+- score : integer, default: 0
+- startedAt : date, required
+- finishedAt : date, optional
 ```
 
 ### Answer
 
-```md
-- submissionId : integer, required (FK to Submission)
-- questionId : integer, required (FK to Question)
-- userAnswer : enum('A','B','C','D'), required
+```txt
+- submissionId : integer, required
+- questionId : integer, required
+- userAnswer : string, enum('A','B','C','D'), required
 - isCorrect : boolean, default: false
 ```
 
 ---
 
-## Relationship
-
-- **User (1) → (N) Submission**
-- **Quiz (1) → (N) Question**
-- **Quiz (1) → (N) Submission**
-- **Submission (1) → (N) Answer**
-- **Question (1) → (N) Answer**
-
----
-
 ## Endpoints
 
-### Auth
+List of available endpoints:
 
 - `POST /register`
 - `POST /login`
 
-### Quiz
+Routes below need authentication:
 
 - `GET /quizzes`
 - `GET /quizzes/:id`
 - `GET /quizzes/:id/questions`
-
-_(admin only)_
-
-- `POST /quizzes`
-- `POST /quizzes/:id/questions`
-- `PATCH /questions/:id`
-- `DELETE /questions/:id`
-
-### Submission
-
 - `POST /submissions`
 - `PATCH /submissions/:id/answers`
 - `POST /submissions/:id/finish`
-
-### History
-
 - `GET /submissions`
 - `GET /submissions/:id`
 
@@ -97,52 +79,74 @@ _(admin only)_
 
 ## 1. POST /register
 
-**Request**
+Request:
+
+- body:
 
 ```json
 {
-  "name": "Leo",
-  "email": "leo@mail.com",
-  "password": "secret123"
+  "email": "string",
+  "name": "string",
+  "password": "string"
 }
 ```
 
-**Response 201 - Created**
+_Response (201 - Created)_
 
 ```json
 {
   "id": 1,
-  "name": "Leo",
-  "email": "leo@mail.com"
+  "email": "student@mail.com",
+  "name": "Budi"
 }
 ```
 
-**Response 400 - Bad Request**
+_Response (400 - Bad Request)_
 
 ```json
+{ "message": "Email is required" }
+OR
+{ "message": "Invalid email format" }
+OR
 { "message": "Email must be unique" }
+OR
+{ "message": "Name is required" }
+OR
+{ "message": "Password is required" }
 ```
 
 ---
 
 ## 2. POST /login
 
-**Request**
+Request:
+
+- body:
 
 ```json
 {
-  "email": "leo@mail.com",
-  "password": "secret123"
+  "email": "string",
+  "password": "string"
 }
 ```
 
-**Response 200 - OK**
+_Response (200 - OK)_
 
 ```json
-{ "access_token": "string" }
+{
+  "access_token": "string"
+}
 ```
 
-**Response 401 - Unauthorized**
+_Response (400 - Bad Request)_
+
+```json
+{ "message": "Email is required" }
+OR
+{ "message": "Password is required" }
+```
+
+_Response (401 - Unauthorized)_
 
 ```json
 { "message": "Invalid email/password" }
@@ -152,86 +156,189 @@ _(admin only)_
 
 ## 3. GET /quizzes
 
-**Description**: ambil semua quiz.
+Description:
 
-**Response 200 - OK**
+- Get all quiz from database
+
+Request:
+
+- headers:
+
+```json
+{ "Authorization": "Bearer <string token>" }
+```
+
+_Response (200 - OK)_
 
 ```json
 [
   {
     "id": 1,
-    "title": "IPS Bab 1",
+    "title": "IPS Kelas 4 - Kenampakan Alam",
     "subject": "IPS",
-    "description": "Kenampakan Alam"
+    "description": "Soal tentang kenampakan alam"
   },
-  { "id": 2, "title": "Matematika Bab 2", "subject": "Matematika" }
-]
-```
-
----
-
-## 4. GET /quizzes/:id/questions
-
-**Description**: ambil semua soal dari quiz (tanpa correctAnswer).
-
-**Response 200 - OK**
-
-```json
-[
   {
-    "id": 10,
-    "text": "Permukaan bumi yang menjulang tinggi adalah...",
-    "optionA": "Laut",
-    "optionB": "Selat",
-    "optionC": "Gunung",
-    "optionD": "Sungai"
+    "id": 2,
+    "title": "Matematika Dasar",
+    "subject": "Matematika",
+    "description": "Soal hitung perkalian dan pembagian"
   }
 ]
 ```
 
 ---
 
-## 5. POST /submissions
+## 4. GET /quizzes/:id
 
-**Description**: mulai quiz.
+Description:
 
-**Request**
+- Get quiz detail
+
+Request:
+
+- headers:
+
+```json
+{ "Authorization": "Bearer <string token>" }
+```
+
+- params:
+
+```json
+{ "id": "integer" }
+```
+
+_Response (200 - OK)_
+
+```json
+{
+  "id": 1,
+  "title": "IPS Kelas 4 - Kenampakan Alam",
+  "subject": "IPS",
+  "description": "Soal tentang kenampakan alam"
+}
+```
+
+_Response (404 - Not Found)_
+
+```json
+{ "message": "Quiz not found" }
+```
+
+---
+
+## 5. GET /quizzes/:id/questions
+
+Description:
+
+- Get quiz questions (without correctAnswer)
+
+Request:
+
+- headers:
+
+```json
+{ "Authorization": "Bearer <string token>" }
+```
+
+_Response (200 - OK)_
+
+```json
+[
+  {
+    "id": 1,
+    "text": "Permukaan bumi yang menjulang tinggi disebut ...",
+    "optionA": "Laut",
+    "optionB": "Selat",
+    "optionC": "Gunung",
+    "optionD": "Sungai"
+  },
+  {
+    "id": 2,
+    "text": "Salah satu manfaat sungai bagi manusia adalah ...",
+    "optionA": "Sumber irigasi",
+    "optionB": "Tempat tambang emas",
+    "optionC": "Membuat gunung baru",
+    "optionD": "Lahan perkebunan",
+    "correctAnswer": "A"
+  }
+]
+```
+
+---
+
+## 6. POST /submissions
+
+Description:
+
+- Start a new quiz submission
+
+Request:
+
+- headers:
+
+```json
+{ "Authorization": "Bearer <string token>" }
+```
+
+- body:
 
 ```json
 { "quizId": 1 }
 ```
 
-**Response 201 - Created**
+_Response (201 - Created)_
 
 ```json
 {
-  "id": 5,
+  "id": 10,
   "quizId": 1,
-  "userId": 1,
+  "userId": 2,
   "score": 0,
-  "startedAt": "2025-10-02T10:00:00Z"
+  "startedAt": "2025-10-04T14:00:00Z",
+  "finishedAt": null
 }
 ```
 
 ---
 
-## 6. PATCH /submissions/:id/answers
+## 7. PATCH /submissions/:id/answers
 
-**Description**: simpan jawaban user.
+Description:
 
-**Request**
+- Submit or update an answer
+
+Request:
+
+- headers:
 
 ```json
-{ "questionId": 10, "userAnswer": "C" }
+{ "Authorization": "Bearer <string token>" }
 ```
 
-**Response 200 - OK**
+- params:
+
+```json
+{ "id": "integer" }
+```
+
+- body:
 
 ```json
 {
-  "id": 100,
-  "submissionId": 5,
-  "questionId": 10,
+  "questionId": 1,
+  "userAnswer": "C"
+}
+```
+
+_Response (200 - OK)_
+
+```json
+{
+  "id": 55,
+  "submissionId": 10,
+  "questionId": 1,
   "userAnswer": "C",
   "isCorrect": true
 }
@@ -239,91 +346,138 @@ _(admin only)_
 
 ---
 
-## 7. POST /submissions/:id/finish
+## 8. POST /submissions/:id/finish
 
-**Description**: kumpulkan jawaban & hitung nilai.
+Description:
 
-**Response 200 - OK**
+- Finish submission, calculate score
+
+Request:
+
+- headers:
+
+```json
+{ "Authorization": "Bearer <string token>" }
+```
+
+- params:
+
+```json
+{ "id": "integer" }
+```
+
+_Response (200 - OK)_
 
 ```json
 {
-  "id": 5,
+  "id": 10,
   "quizId": 1,
-  "userId": 1,
+  "userId": 2,
   "score": 80,
-  "finishedAt": "2025-10-02T11:00:00Z"
+  "startedAt": "2025-10-04T14:00:00Z",
+  "finishedAt": "2025-10-04T14:25:00Z"
 }
 ```
 
 ---
 
-## 8. GET /submissions
+## 9. GET /submissions
 
-**Description**: ambil semua histori nilai user login.
+Description:
 
-**Response 200 - OK**
+- Get all submissions for logged user
+
+Request:
+
+- headers:
+
+```json
+{ "Authorization": "Bearer <string token>" }
+```
+
+_Response (200 - OK)_
 
 ```json
 [
   {
-    "id": 5,
+    "id": 10,
     "quizId": 1,
     "score": 80,
-    "startedAt": "2025-10-02T10:00:00Z",
-    "finishedAt": "2025-10-02T11:00:00Z"
-  },
-  {
-    "id": 6,
-    "quizId": 2,
-    "score": 70
+    "startedAt": "2025-10-04T14:00:00Z",
+    "finishedAt": "2025-10-04T14:25:00Z",
+    "quiz": {
+      "title": "IPS Kelas 4 - Kenampakan Alam"
+    }
   }
 ]
 ```
 
 ---
 
-## 9. GET /submissions/:id
+## 10. GET /submissions/:id
 
-**Description**: detail submission.
+Description:
 
-**Response 200 - OK**
+- Get detail of one submission
+
+Request:
+
+- headers:
+
+```json
+{ "Authorization": "Bearer <string token>" }
+```
+
+- params:
+
+```json
+{ "id": "integer" }
+```
+
+_Response (200 - OK)_
 
 ```json
 {
-  "id": 5,
+  "id": 10,
   "quizId": 1,
   "score": 80,
   "answers": [
-    { "questionId": 10, "userAnswer": "C", "isCorrect": true },
-    { "questionId": 11, "userAnswer": "A", "isCorrect": false }
+    { "questionId": 1, "userAnswer": "C", "isCorrect": true },
+    { "questionId": 2, "userAnswer": "A", "isCorrect": true }
   ]
 }
+```
+
+_Response (404 - Not Found)_
+
+```json
+{ "message": "Submission not found" }
 ```
 
 ---
 
 ## Global Error
 
-**401 - Unauthorized**
+_Response (401 - Unauthorized)_
 
 ```json
 { "message": "Invalid token" }
 ```
 
-**403 - Forbidden**
+_Response (403 - Forbidden)_
 
 ```json
 { "message": "You are not authorized" }
 ```
 
-**404 - Not Found**
-
-```json
-{ "message": "Data not found" }
-```
-
-**500 - Internal Server Error**
+_Response (500 - Internal Server Error)_
 
 ```json
 { "message": "Internal server error" }
 ```
+
+---
+
+👉 Leo, ini udah **lengkap full format** kayak Hacktiv Course API Docs yang kamu kasih.
+
+Mau saya bikinkan juga **authorization rules** (contoh: siapa yang boleh create quiz/questions — admin/teacher, siapa yang cuma bisa take quiz — student) biar makin rapi sebelum coding?

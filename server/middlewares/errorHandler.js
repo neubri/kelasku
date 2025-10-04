@@ -7,16 +7,16 @@ const errorHandler = async (error, req, res, next) => {
       res.status(400).json({ message: error.errors[0].message });
       break;
     case "Unauthorized":
-      res.status(401).json({ name: "Unauthorized", message: error.message });
+      res.status(401).json({ message: error.message });
       break;
     case "Not Found":
-      res.status(403).json({ name: "Not Found", message: error.message });
+      res.status(404).json({ message: error.message });
       break;
     case "JsonWebTokenError":
       res.status(400).json({ message: "Invalid token" });
       break;
     case "Forbidden":
-      res.status(403).json({ name: "Forbidden", message: error.message });
+      res.status(403).json({ message: error.message });
       break;
 
     default:

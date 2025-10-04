@@ -18,6 +18,12 @@ class userController {
   static async login(req, res, next) {
     try {
       const { email, password } = req.body;
+
+      if (!email) throw { name: "Bad Request", message: "Email is required" };
+
+      if (!password)
+        throw { name: "Bad Request", message: "Password is required" };
+
       const user = await User.findOne({ where: { email } });
 
       if (!user)
