@@ -1,6 +1,3 @@
-Mantap Leo 👍 aku paham kamu mau format API Docs **persis** kayak Hacktiv Course / Gift tadi (detail per endpoint, lengkap dengan request, response sukses & error).
-Aku susun untuk aplikasi **CBT Quiz** sesuai ERD yang sudah kita setujui.
-
 ---
 
 # 📘 CBT Quiz API Documentation
@@ -268,11 +265,11 @@ _Response (200 - OK)_
 
 ---
 
-## 6. POST /submissions
+## 6. POST /quizzes/:quizId/submissions
 
 Description:
 
-- Start a new quiz submission
+- Start a new quiz submission for the given quiz.
 
 Request:
 
@@ -282,10 +279,10 @@ Request:
 { "Authorization": "Bearer <string token>" }
 ```
 
-- body:
+- params:
 
 ```json
-{ "quizId": 1 }
+{ "quizId": "integer" }
 ```
 
 _Response (201 - Created)_
@@ -299,6 +296,12 @@ _Response (201 - Created)_
   "startedAt": "2025-10-04T14:00:00Z",
   "finishedAt": null
 }
+```
+
+_Response (404 - Not Found)_
+
+```json
+{ "message": "Quiz not found" }
 ```
 
 ---
@@ -477,7 +480,3 @@ _Response (500 - Internal Server Error)_
 ```
 
 ---
-
-👉 Leo, ini udah **lengkap full format** kayak Hacktiv Course API Docs yang kamu kasih.
-
-Mau saya bikinkan juga **authorization rules** (contoh: siapa yang boleh create quiz/questions — admin/teacher, siapa yang cuma bisa take quiz — student) biar makin rapi sebelum coding?

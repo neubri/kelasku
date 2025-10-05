@@ -6,6 +6,9 @@ const errorHandler = async (error, req, res, next) => {
     case "SequelizeUniqueConstraintError":
       res.status(400).json({ message: error.errors[0].message });
       break;
+    case "Bad Request":
+      res.status(400).json({ message: error.message });
+      break;
     case "Unauthorized":
       res.status(401).json({ message: error.message });
       break;

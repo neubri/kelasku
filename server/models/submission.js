@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association
       Submission.belongsTo(models.User, { foreignKey: "userId" });
-      Submission.belongsTo(models.Answer, { foreignKey: "answerId" });
       Submission.hasMany(models.Answer, { foreignKey: "submissionId" });
+      Submission.belongsTo(models.Quiz, { foreignKey: "quizId" });
     }
   }
   Submission.init(
