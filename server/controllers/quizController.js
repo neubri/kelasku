@@ -1,4 +1,4 @@
-const { Quiz, Question } = require("../models/index");
+const { Quiz, Question, Submission } = require("../models/index");
 
 class quizController {
   static async getQuizzes(req, res, next) {
@@ -54,6 +54,36 @@ class quizController {
 
       res.status(200).json(quizQuestion);
     } catch (error) {
+      next(error);
+    }
+  }
+
+  static async createSubmission(req, res, next) {
+    try {
+      const { quizId } = req.params;
+      const { userId } = req.user;
+
+      // check is quiz valid
+      const quiz = await Quiz.findByPk(quizId);
+      if (!quiz) throw { name: "Not Found", message: "Quiz not found" };
+
+      //create submission
+      const submission = await Submission.create({
+        quizId,
+        userId,
+        startedAt: new Date(),
+      });
+
+      res.status(201).json({
+        id: submission.id,
+        quizId: submission.quizId,
+        userId: submission.userId,
+        score: submission.score,
+        startedAt: submission.startedAt,
+        finishedAt: submission.finishedAt,
+      });
+    } catch (error) {
+      console.log(error);
       next(error);
     }
   }

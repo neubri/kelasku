@@ -9,6 +9,7 @@ router.use("/", require("./userRouter"));
 //auth routes
 router.use(authentication);
 router.use("/quizzes", require("./quizzesRouter"));
+router.use("/submissions", require("./submissionRouter"));
 router.use(errorHandler);
 
 module.exports = router;
