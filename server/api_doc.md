@@ -9,8 +9,8 @@
 ```txt
 - email : string, required, unique, isEmail
 - name : string, required
-- password : string, required
-- role : string, enum('student','teacher','admin'), default: 'student'
+- password : string, required, min 5 characters
+- role : string, default: 'user'
 ```
 
 ### Quiz
@@ -18,7 +18,7 @@
 ```txt
 - title : string, required
 - subject : string, required
-- description : string
+- description : string, optional
 ```
 
 ### Question
@@ -66,7 +66,7 @@ Routes below need authentication:
 - `GET /quizzes`
 - `GET /quizzes/:id`
 - `GET /quizzes/:id/questions`
-- `POST /submissions`
+- `POST /quizzes/:quizId/submissions`
 - `PATCH /submissions/:id/answers`
 - `POST /submissions/:id/finish`
 - `GET /submissions`
@@ -82,8 +82,8 @@ Request:
 
 ```json
 {
-  "email": "string",
   "name": "string",
+  "email": "string",
   "password": "string"
 }
 ```
@@ -93,23 +93,24 @@ _Response (201 - Created)_
 ```json
 {
   "id": 1,
-  "email": "student@mail.com",
-  "name": "Budi"
+  "email": "admin@mail.com"
 }
 ```
 
 _Response (400 - Bad Request)_
 
 ```json
+{ "message": "Name is required" }
+OR
 { "message": "Email is required" }
 OR
 { "message": "Invalid email format" }
 OR
 { "message": "Email must be unique" }
 OR
-{ "message": "Name is required" }
-OR
 { "message": "Password is required" }
+OR
+{ "message": "Password need at least 5 character" }
 ```
 
 ---
@@ -146,7 +147,7 @@ OR
 _Response (401 - Unauthorized)_
 
 ```json
-{ "message": "Invalid email/password" }
+{ "message": "Invalid email or password" }
 ```
 
 ---
@@ -171,15 +172,15 @@ _Response (200 - OK)_
 [
   {
     "id": 1,
-    "title": "IPS Kelas 4 - Kenampakan Alam",
+    "title": "ESPS IPS 4 SD - Kenampakan Alam dan Pemanfaatannya",
     "subject": "IPS",
-    "description": "Soal tentang kenampakan alam"
+    "description": "Soal latihan tentang kenampakan alam dan pemanfaatannya untuk kelas IV SD."
   },
   {
     "id": 2,
-    "title": "Matematika Dasar",
+    "title": "ESPS Matematika 5 SD - Pecahan dan Operasinya",
     "subject": "Matematika",
-    "description": "Soal hitung perkalian dan pembagian"
+    "description": "Soal latihan tentang konsep pecahan dan berbagai operasi hitungnya untuk kelas V SD."
   }
 ]
 ```
@@ -211,9 +212,9 @@ _Response (200 - OK)_
 ```json
 {
   "id": 1,
-  "title": "IPS Kelas 4 - Kenampakan Alam",
+  "title": "ESPS IPS 4 SD - Kenampakan Alam dan Pemanfaatannya",
   "subject": "IPS",
-  "description": "Soal tentang kenampakan alam"
+  "description": "Soal latihan tentang kenampakan alam dan pemanfaatannya untuk kelas IV SD."
 }
 ```
 
@@ -229,7 +230,7 @@ _Response (404 - Not Found)_
 
 Description:
 
-- Get quiz questions (without correctAnswer)
+- Get quiz with questions (without correctAnswer for security)
 
 Request:
 
@@ -239,28 +240,47 @@ Request:
 { "Authorization": "Bearer <string token>" }
 ```
 
+- params:
+
+```json
+{ "id": "integer" }
+```
+
 _Response (200 - OK)_
 
 ```json
-[
-  {
-    "id": 1,
-    "text": "Permukaan bumi yang menjulang tinggi disebut ...",
-    "optionA": "Laut",
-    "optionB": "Selat",
-    "optionC": "Gunung",
-    "optionD": "Sungai"
-  },
-  {
-    "id": 2,
-    "text": "Salah satu manfaat sungai bagi manusia adalah ...",
-    "optionA": "Sumber irigasi",
-    "optionB": "Tempat tambang emas",
-    "optionC": "Membuat gunung baru",
-    "optionD": "Lahan perkebunan",
-    "correctAnswer": "A"
-  }
-]
+{
+  "id": 1,
+  "title": "ESPS IPS 4 SD - Kenampakan Alam dan Pemanfaatannya",
+  "subject": "IPS",
+  "description": "Soal latihan tentang kenampakan alam dan pemanfaatannya untuk kelas IV SD.",
+  "Questions": [
+    {
+      "id": 1,
+      "quizId": 1,
+      "text": "Permukaan bumi yang menjulang tinggi disebut ...",
+      "optionA": "Laut",
+      "optionB": "Selat",
+      "optionC": "Gunung",
+      "optionD": "Sungai"
+    },
+    {
+      "id": 2,
+      "quizId": 1,
+      "text": "Salah satu manfaat sungai bagi manusia adalah ...",
+      "optionA": "Sumber air irigasi dan transportasi lokal",
+      "optionB": "Tempat tambang emas",
+      "optionC": "Membuat gunung baru",
+      "optionD": "Lahan perkebunan kelapa sawit"
+    }
+  ]
+}
+```
+
+_Response (404 - Not Found)_
+
+```json
+{ "message": "Quiz Question not found" }
 ```
 
 ---
@@ -269,7 +289,7 @@ _Response (200 - OK)_
 
 Description:
 
-- Start a new quiz submission for the given quiz.
+- Start a new quiz submission for the given quiz
 
 Request:
 
@@ -289,11 +309,11 @@ _Response (201 - Created)_
 
 ```json
 {
-  "id": 10,
+  "id": 1,
   "quizId": 1,
-  "userId": 2,
+  "userId": 1,
   "score": 0,
-  "startedAt": "2025-10-04T14:00:00Z",
+  "startedAt": "2025-10-07T14:00:00Z",
   "finishedAt": null
 }
 ```
@@ -310,7 +330,7 @@ _Response (404 - Not Found)_
 
 Description:
 
-- Submit or update an answer
+- Submit or update an answer for a specific question
 
 Request:
 
@@ -323,7 +343,7 @@ Request:
 - params:
 
 ```json
-{ "id": "integer" }
+{ "id": "integer (submission id)" }
 ```
 
 - body:
@@ -339,12 +359,26 @@ _Response (200 - OK)_
 
 ```json
 {
-  "id": 55,
-  "submissionId": 10,
+  "id": 1,
+  "submissionId": 1,
   "questionId": 1,
   "userAnswer": "C",
   "isCorrect": true
 }
+```
+
+_Response (404 - Not Found)_
+
+```json
+{ "message": "Submission not found" }
+OR
+{ "message": "Question not found" }
+```
+
+_Response (403 - Forbidden)_
+
+```json
+{ "message": "You are not authorized" }
 ```
 
 ---
@@ -353,7 +387,7 @@ _Response (200 - OK)_
 
 Description:
 
-- Finish submission, calculate score
+- Finish submission and calculate final score
 
 Request:
 
@@ -366,20 +400,40 @@ Request:
 - params:
 
 ```json
-{ "id": "integer" }
+{ "id": "integer (submission id)" }
 ```
 
 _Response (200 - OK)_
 
 ```json
 {
-  "id": 10,
+  "id": 1,
   "quizId": 1,
-  "userId": 2,
+  "userId": 1,
   "score": 80,
-  "startedAt": "2025-10-04T14:00:00Z",
-  "finishedAt": "2025-10-04T14:25:00Z"
+  "startedAt": "2025-10-07T14:00:00Z",
+  "finishedAt": "2025-10-07T14:30:00Z"
 }
+```
+
+_Response (400 - Bad Request)_
+
+```json
+{ "message": "Submission already finished" }
+OR
+{ "message": "No answers found" }
+```
+
+_Response (404 - Not Found)_
+
+```json
+{ "message": "Submission not found" }
+```
+
+_Response (403 - Forbidden)_
+
+```json
+{ "message": "You are not authorized" }
 ```
 
 ---
@@ -388,7 +442,7 @@ _Response (200 - OK)_
 
 Description:
 
-- Get all submissions for logged user
+- Get all submissions history for logged user
 
 Request:
 
@@ -403,13 +457,25 @@ _Response (200 - OK)_
 ```json
 [
   {
-    "id": 10,
+    "id": 1,
+    "userId": 1,
     "quizId": 1,
     "score": 80,
-    "startedAt": "2025-10-04T14:00:00Z",
-    "finishedAt": "2025-10-04T14:25:00Z",
-    "quiz": {
-      "title": "IPS Kelas 4 - Kenampakan Alam"
+    "startedAt": "2025-10-07T14:00:00Z",
+    "finishedAt": "2025-10-07T14:30:00Z",
+    "Quiz": {
+      "title": "ESPS IPS 4 SD - Kenampakan Alam dan Pemanfaatannya"
+    }
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "quizId": 2,
+    "score": 70,
+    "startedAt": "2025-10-07T15:00:00Z",
+    "finishedAt": "2025-10-07T15:25:00Z",
+    "Quiz": {
+      "title": "ESPS Matematika 5 SD - Pecahan dan Operasinya"
     }
   }
 ]
@@ -421,7 +487,7 @@ _Response (200 - OK)_
 
 Description:
 
-- Get detail of one submission
+- Get detail of one submission with all answers
 
 Request:
 
@@ -434,19 +500,33 @@ Request:
 - params:
 
 ```json
-{ "id": "integer" }
+{ "id": "integer (submission id)" }
 ```
 
 _Response (200 - OK)_
 
 ```json
 {
-  "id": 10,
+  "id": 1,
+  "userId": 1,
   "quizId": 1,
   "score": 80,
-  "answers": [
-    { "questionId": 1, "userAnswer": "C", "isCorrect": true },
-    { "questionId": 2, "userAnswer": "A", "isCorrect": true }
+  "Answers": [
+    {
+      "questionId": 1,
+      "userAnswer": "C",
+      "isCorrect": true
+    },
+    {
+      "questionId": 2,
+      "userAnswer": "A",
+      "isCorrect": true
+    },
+    {
+      "questionId": 3,
+      "userAnswer": "B",
+      "isCorrect": false
+    }
   ]
 }
 ```
@@ -457,6 +537,12 @@ _Response (404 - Not Found)_
 { "message": "Submission not found" }
 ```
 
+_Response (403 - Forbidden)_
+
+```json
+{ "message": "You are not authorized" }
+```
+
 ---
 
 ## Global Error
@@ -465,6 +551,8 @@ _Response (401 - Unauthorized)_
 
 ```json
 { "message": "Invalid token" }
+OR
+{ "message": "User not found" }
 ```
 
 _Response (403 - Forbidden)_
@@ -476,7 +564,7 @@ _Response (403 - Forbidden)_
 _Response (500 - Internal Server Error)_
 
 ```json
-{ "message": "Internal server error" }
+{ "message": "Internal Server Error" }
 ```
 
 ---

@@ -39,6 +39,9 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      imageUrl: {
+        type: DataTypes.TEXT,
+      },
       optionA: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -84,6 +87,18 @@ module.exports = (sequelize, DataTypes) => {
           },
           notEmpty: {
             msg: "Option D is required",
+          },
+        },
+      },
+      explanation: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "Explanation is required",
+          },
+          notEmpty: {
+            msg: "Explanation is required",
           },
         },
       },

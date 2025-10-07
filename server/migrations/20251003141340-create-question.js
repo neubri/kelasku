@@ -23,6 +23,9 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      imageUrl: {
+        type: Sequelize.TEXT,
+      },
       optionA: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -37,6 +40,10 @@ module.exports = {
       },
       optionD: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      explanation: {
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       correctAnswer: {

@@ -44,7 +44,7 @@ class quizController {
         include: {
           model: Question,
           attributes: {
-            exclude: ["correctAnswer", "createdAt", "updatedAt"],
+            exclude: ["correctAnswer", "explanation", "createdAt", "updatedAt"],
           },
         },
       });
@@ -83,7 +83,6 @@ class quizController {
         finishedAt: submission.finishedAt,
       });
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
