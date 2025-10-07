@@ -105,9 +105,12 @@ export default function RegisterPage() {
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button variant="outline" className="w-full">
-            <Link to="/login">Sign In</Link>
-          </Button>
+          <CardDescription className="text-center">
+            Don&apos;t have an account?{" "}
+            <Link className="text-orange-400" to="/register">
+              Sign up
+            </Link>
+          </CardDescription>
         </CardFooter>
       </Card>
     </div>

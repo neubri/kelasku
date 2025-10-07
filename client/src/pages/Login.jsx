@@ -84,6 +84,12 @@ export default function LoginPage() {
               <Button type="submit" className="w-full">
                 Login
               </Button>
+              <CardDescription className="text-center py-2">
+                Don&apos;t have an account?{" "}
+                <Link className="text-orange-400" to="/register">
+                  Sign up
+                </Link>
+              </CardDescription>
             </div>
           </form>
         </CardContent>

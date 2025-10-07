@@ -4,5 +4,35 @@
     "title": "ESPS IPS 4 SD - Kenampakan Alam dan Pemanfaatannya",
     "subject": "IPS",
     "description": "Soal latihan tentang kenampakan alam dan pemanfaatannya untuk kelas IV SD."
+  },
+  {
+    "id": 2,
+    "title": "ESPS Matematika 5 SD - Pecahan dan Operasinya",
+    "subject": "Matematika",
+    "description": "Soal latihan tentang konsep pecahan dan berbagai operasi hitungnya untuk kelas V SD."
+  },
+  {
+    "id": 3,
+    "title": "ESPS Bahasa Indonesia 3 SD - Teks Deskripsi Hewan",
+    "subject": "Bahasa Indonesia",
+    "description": "Soal latihan membuat dan memahami teks deskripsi sederhana tentang hewan untuk kelas III SD."
+  },
+  {
+    "id": 4,
+    "title": "ESPS IPA 6 SD - Rangkaian Listrik Sederhana",
+    "subject": "IPA",
+    "description": "Soal latihan mengenai jenis-jenis rangkaian listrik dan penerapannya dalam kehidupan sehari-hari untuk kelas VI SD."
+  },
+  {
+    "id": 5,
+    "title": "ESPS PPKn 2 SD - Gotong Royong di Lingkungan Rumah",
+    "subject": "PPKn",
+    "description": "Soal latihan tentang pentingnya sikap gotong royong dan contoh penerapannya di lingkungan rumah untuk kelas II SD."
+  },
+  {
+    "id": 6,
+    "title": "ESPS Seni Budaya 4 SD - Tari Tradisional Daerah",
+    "subject": "Seni Budaya",
+    "description": "Soal latihan mengidentifikasi dan mengenal tari tradisional dari berbagai daerah di Indonesia untuk kelas IV SD."
   }
 ]
