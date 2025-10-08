@@ -25,6 +25,7 @@ module.exports = {
       },
       imageUrl: {
         type: Sequelize.TEXT,
+        defaultValue: null,
       },
       optionA: {
         type: Sequelize.STRING,
