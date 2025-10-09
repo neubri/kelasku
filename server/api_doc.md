@@ -491,7 +491,7 @@ _Response (200 - OK)_
 
 Description:
 
-- Get detail of one submission with all answers
+- Get detailed submission with all quiz questions, user answers, and explanations (optimized with single query for better performance)
 
 Request:
 
@@ -515,20 +515,46 @@ _Response (200 - OK)_
   "userId": 1,
   "quizId": 1,
   "score": 80,
-  "Answers": [
+  "startedAt": "2025-10-07T14:00:00Z",
+  "finishedAt": "2025-10-07T14:30:00Z",
+  "questions": [
     {
-      "questionId": 1,
+      "id": 1,
+      "text": "Permukaan bumi yang menjulang tinggi disebut ...",
+      "imageUrl": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3",
+      "optionA": "Laut",
+      "optionB": "Selat",
+      "optionC": "Gunung",
+      "optionD": "Sungai",
+      "correctAnswer": "C",
+      "explanation": "Gunung adalah bagian dari permukaan bumi yang menjulang tinggi di atas daerah sekitarnya dengan ketinggian minimal 600 meter dari permukaan laut.",
       "userAnswer": "C",
       "isCorrect": true
     },
     {
-      "questionId": 2,
+      "id": 2,
+      "text": "Salah satu manfaat sungai bagi manusia adalah ...",
+      "imageUrl": null,
+      "optionA": "Sumber air irigasi dan transportasi lokal",
+      "optionB": "Tempat tambang emas",
+      "optionC": "Membuat gunung baru",
+      "optionD": "Lahan perkebunan kelapa sawit",
+      "correctAnswer": "A",
+      "explanation": "Sungai sangat bermanfaat sebagai sumber air untuk irigasi pertanian dan sebagai jalur transportasi air untuk masyarakat lokal.",
       "userAnswer": "A",
       "isCorrect": true
     },
     {
-      "questionId": 3,
-      "userAnswer": "B",
+      "id": 3,
+      "text": "Kenampakan alam yang berupa cekungan besar berisi air asin adalah ...",
+      "imageUrl": null,
+      "optionA": "Danau",
+      "optionB": "Laut",
+      "optionC": "Sungai",
+      "optionD": "Teluk",
+      "correctAnswer": "B",
+      "explanation": "Laut adalah cekungan besar yang berisi air asin dan merupakan bagian terbesar dari permukaan bumi.",
+      "userAnswer": "A",
       "isCorrect": false
     }
   ]
@@ -570,54 +596,5 @@ _Response (500 - Internal Server Error)_
 ```json
 { "message": "Internal Server Error" }
 ```
-
----
-
-## Recent Updates & Important Notes
-
-### Security Enhancements
-
-- **Questions endpoint** (`GET /quizzes/:id/questions`) now excludes both `correctAnswer` and `explanation` fields during quiz to prevent cheating
-- **User authorization** is enforced on all submission-related endpoints
-- **JWT authentication** is required for all protected routes
-
-### Database Schema Updates
-
-- **Question model** now includes:
-  - `imageUrl` (TEXT, optional) - for multimedia content support
-  - `explanation` (TEXT, required) - detailed explanation for answers
-- **Error messages** have been standardized and corrected
-
-### API Response Format
-
-- **Quiz questions** include optional `imageUrl` field
-- **Submission answers** include `isCorrect` boolean for immediate feedback
-- **Error responses** follow consistent format: `{ "message": "Error description" }`
-
-### Router Configuration
-
-```javascript
-// Protected routes structure:
-router.use("/quizzes", quizzesRouter);
-  - GET    /quizzes
-  - GET    /quizzes/:id
-  - GET    /quizzes/:id/questions
-  - POST   /quizzes/:quizId/submissions
-
-router.use("/submissions", submissionRouter);
-  - GET    /submissions
-  - GET    /submissions/:id
-  - PATCH  /submissions/:id/answers
-  - POST   /submissions/:id/finish
-```
-
-### Frontend Integration Ready
-
-This API is designed to work seamlessly with:
-
-- React-based quiz applications
-- Real-time answer submission and tracking
-- Multimedia question support with images
-- Complete quiz review with explanations post-completion
 
 ---

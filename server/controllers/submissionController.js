@@ -137,26 +137,77 @@ class submissionController {
       const { id } = req.params;
       const { userId } = req.user;
 
+      // Single query with complex joins - Most optimal!
       const submission = await Submission.findOne({
         where: { id },
-        attributes: {
-          exclude: ["createdAt", "updatedAt", "startedAt", "finishedAt"],
-        },
-        include: {
-          model: Answer,
-          attributes: ["questionId", "userAnswer", "isCorrect"],
-        },
+        attributes: [
+          "id",
+          "userId",
+          "quizId",
+          "score",
+          "startedAt",
+          "finishedAt",
+        ],
+        include: [
+          {
+            model: Quiz,
+            attributes: ["id"],
+            include: {
+              model: Question,
+              attributes: [
+                "id",
+                "text",
+                "imageUrl",
+                "optionA",
+                "optionB",
+                "optionC",
+                "optionD",
+                "correctAnswer",
+                "explanation",
+              ],
+              include: {
+                model: Answer,
+                attributes: ["userAnswer", "isCorrect"],
+                where: { submissionId: id },
+                required: false, // LEFT JOIN to include questions without answers
+              },
+            },
+          },
+        ],
       });
 
       if (!submission)
         throw { name: "Not Found", message: "Submission not found" };
 
-      //forbidden validation
+      // Forbidden validation
       if (submission.userId !== userId) {
         throw { name: "Forbidden", message: "You are not authorized" };
       }
 
-      res.status(200).json(submission);
+      // Transform data for cleaner response
+      const questions = submission.Quiz.Questions.map((question) => ({
+        id: question.id,
+        text: question.text,
+        imageUrl: question.imageUrl,
+        optionA: question.optionA,
+        optionB: question.optionB,
+        optionC: question.optionC,
+        optionD: question.optionD,
+        correctAnswer: question.correctAnswer,
+        explanation: question.explanation,
+        userAnswer: question.Answers[0]?.userAnswer || null,
+        isCorrect: question.Answers[0]?.isCorrect || false,
+      }));
+
+      res.status(200).json({
+        id: submission.id,
+        userId: submission.userId,
+        quizId: submission.quizId,
+        score: submission.score,
+        startedAt: submission.startedAt,
+        finishedAt: submission.finishedAt,
+        questions: questions,
+      });
     } catch (error) {
       next(error);
     }
