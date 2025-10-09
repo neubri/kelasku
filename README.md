@@ -1,329 +1,129 @@
-# Kelasku CBT API Documentation
+# Kelasku - CBT Quiz Application
 
-## Models
+Kelasku is a web-based Computer Based Test (CBT) application designed for educational quizzes. It allows users to take quizzes, track their progress, and review their results with detailed explanations.
 
-### User
+## Development Progress
 
-```md
-- name : string, required
-- email : string, required, unique, isEmail
-- password : string, required (stored as bcrypt hash)
-- role : enum('user','admin'), default: 'user'
+### Backend Development
+
+- [x] Database schema design and migrations
+- [x] User authentication system
+- [x] Quiz and Question models
+- [x] Submission and Answer tracking
+- [x] RESTful API endpoints
+- [x] Error handling middleware
+- [x] Data seeding for development
+- [x] API optimization for quiz review
+
+### Frontend Development
+
+- [x] Project setup with React and Vite
+- [x] Redux store configuration
+- [x] Authentication pages (Login/Register) - **Integrated with backend**
+- [x] Home page with quiz listing - **Using dummy data for UI**
+- [x] Quiz interface with question navigation - **Using dummy data for UI**
+- [x] Progress tracking component - **Using dummy data for UI**
+- [x] Result page with score display - **Using dummy data for UI**
+- [x] Question review with explanations - **Using dummy data for UI**
+- [x] Responsive design implementation
+
+## Technology Stack
+
+**Backend:**
+
+- Framework: Node.js with Express.js
+- Database: PostgreSQL with Sequelize ORM
+- Authentication: JWT (JSON Web Tokens)
+- Password Security: bcrypt hashing
+
+**Frontend:**
+
+- Framework: React 19 with Vite
+- Styling: TailwindCSS 4
+- Routing: React Router 7
+- State Management: Redux Toolkit
+- HTTP Client: Axios
+
+### Integration & Testing
+
+- [x] API integration for authentication (Login/Register)
+- [x] Authentication flow with JWT tokens
+- [x] User session management
+- [x] Error handling and validation
+- [ ] Full quiz API integration (currently using dummy data)
+- [ ] Submission and scoring integration
+- [ ] Mobile responsiveness testing
+
+## Current Integration Status
+
+### Fully Integrated Features
+
+- **User Authentication**: Complete integration between frontend and backend
+  - Registration with validation
+  - Login with JWT token management
+  - Protected route middleware
+  - Session persistence
+
+### UI Development with Dummy Data
+
+- **Quiz Interface**: Frontend uses static data for UI development
+  - Quiz listing page with sample quizzes
+  - Question navigation and answer selection
+  - Progress tracking and timer functionality
+  - Result display and review pages
+
+### Pending Integration
+
+- **Quiz Management**: Backend APIs ready, frontend integration pending
+- **Submission System**: Database models complete, API integration needed
+- **Score Calculation**: Backend logic implemented, frontend integration pending
+- **Quiz History**: Backend endpoints available, frontend connection needed
+
+### Documentation
+
+- [x] API documentation
+- [x] Database schema documentation
+- [x] Setup and installation guide
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- PostgreSQL database
+- npm or yarn package manager
+
+### Installation
+
+1. Install dependencies:
+
+```bash
+npm install
 ```
 
-### Quiz
+2. Run the app locally:
 
-```md
-- title : string, required
-- subject : string, required
-- description : string, optional
+```bash
+npm run dev
 ```
 
-### Question
+3. Open in your browser: Visit `http://localhost:5173` (or the port shown in your terminal).
 
-```md
-- quizId : integer, required (FK to Quiz)
-- text : string, required
-- optionA : string, required
-- optionB : string, required
-- optionC : string, required
-- optionD : string, required
-- correctAnswer : enum('A','B','C','D'), required
+## Project Structure
+
 ```
-
-### Submission
-
-```md
-- userId : integer, required (FK to User)
-- quizId : integer, required (FK to Quiz)
-- score : decimal (0–100), default: 0
-- startedAt : datetime, required
-- finishedAt : datetime, optional
-```
-
-### Answer
-
-```md
-- submissionId : integer, required (FK to Submission)
-- questionId : integer, required (FK to Question)
-- userAnswer : enum('A','B','C','D'), required
-- isCorrect : boolean, default: false
-```
-
----
-
-## Relationship
-
-- **User (1) → (N) Submission**
-- **Quiz (1) → (N) Question**
-- **Quiz (1) → (N) Submission**
-- **Submission (1) → (N) Answer**
-- **Question (1) → (N) Answer**
-
----
-
-## Endpoints
-
-### Auth
-
-- `POST /register`
-- `POST /login`
-
-### Quiz
-
-- `GET /quizzes`
-- `GET /quizzes/:id`
-- `GET /quizzes/:id/questions`
-
-_(admin only)_
-
-- `POST /quizzes`
-- `POST /quizzes/:id/questions`
-- `PATCH /questions/:id`
-- `DELETE /questions/:id`
-
-### Submission
-
-- `POST /submissions`
-- `PATCH /submissions/:id/answers`
-- `POST /submissions/:id/finish`
-
-### History
-
-- `GET /submissions`
-- `GET /submissions/:id`
-
----
-
-## 1. POST /register
-
-**Request**
-
-```json
-{
-  "name": "Leo",
-  "email": "leo@mail.com",
-  "password": "secret123"
-}
-```
-
-**Response 201 - Created**
-
-```json
-{
-  "id": 1,
-  "name": "Leo",
-  "email": "leo@mail.com"
-}
-```
-
-**Response 400 - Bad Request**
-
-```json
-{ "message": "Email must be unique" }
-```
-
----
-
-## 2. POST /login
-
-**Request**
-
-```json
-{
-  "email": "leo@mail.com",
-  "password": "secret123"
-}
-```
-
-**Response 200 - OK**
-
-```json
-{ "access_token": "string" }
-```
-
-**Response 401 - Unauthorized**
-
-```json
-{ "message": "Invalid email/password" }
-```
-
----
-
-## 3. GET /quizzes
-
-**Description**: ambil semua quiz.
-
-**Response 200 - OK**
-
-```json
-[
-  {
-    "id": 1,
-    "title": "IPS Bab 1",
-    "subject": "IPS",
-    "description": "Kenampakan Alam"
-  },
-  { "id": 2, "title": "Matematika Bab 2", "subject": "Matematika" }
-]
-```
-
----
-
-## 4. GET /quizzes/:id/questions
-
-**Description**: ambil semua soal dari quiz (tanpa correctAnswer).
-
-**Response 200 - OK**
-
-```json
-[
-  {
-    "id": 10,
-    "text": "Permukaan bumi yang menjulang tinggi adalah...",
-    "optionA": "Laut",
-    "optionB": "Selat",
-    "optionC": "Gunung",
-    "optionD": "Sungai"
-  }
-]
-```
-
----
-
-## 5. POST /submissions
-
-**Description**: mulai quiz.
-
-**Request**
-
-```json
-{ "quizId": 1 }
-```
-
-**Response 201 - Created**
-
-```json
-{
-  "id": 5,
-  "quizId": 1,
-  "userId": 1,
-  "score": 0,
-  "startedAt": "2025-10-02T10:00:00Z"
-}
-```
-
----
-
-## 6. PATCH /submissions/:id/answers
-
-**Description**: simpan jawaban user.
-
-**Request**
-
-```json
-{ "questionId": 10, "userAnswer": "C" }
-```
-
-**Response 200 - OK**
-
-```json
-{
-  "id": 100,
-  "submissionId": 5,
-  "questionId": 10,
-  "userAnswer": "C",
-  "isCorrect": true
-}
-```
-
----
-
-## 7. POST /submissions/:id/finish
-
-**Description**: kumpulkan jawaban & hitung nilai.
-
-**Response 200 - OK**
-
-```json
-{
-  "id": 5,
-  "quizId": 1,
-  "userId": 1,
-  "score": 80,
-  "finishedAt": "2025-10-02T11:00:00Z"
-}
-```
-
----
-
-## 8. GET /submissions
-
-**Description**: ambil semua histori nilai user login.
-
-**Response 200 - OK**
-
-```json
-[
-  {
-    "id": 5,
-    "quizId": 1,
-    "score": 80,
-    "startedAt": "2025-10-02T10:00:00Z",
-    "finishedAt": "2025-10-02T11:00:00Z"
-  },
-  {
-    "id": 6,
-    "quizId": 2,
-    "score": 70
-  }
-]
-```
-
----
-
-## 9. GET /submissions/:id
-
-**Description**: detail submission.
-
-**Response 200 - OK**
-
-```json
-{
-  "id": 5,
-  "quizId": 1,
-  "score": 80,
-  "answers": [
-    { "questionId": 10, "userAnswer": "C", "isCorrect": true },
-    { "questionId": 11, "userAnswer": "A", "isCorrect": false }
-  ]
-}
-```
-
----
-
-## Global Error
-
-**401 - Unauthorized**
-
-```json
-{ "message": "Invalid token" }
-```
-
-**403 - Forbidden**
-
-```json
-{ "message": "You are not authorized" }
-```
-
-**404 - Not Found**
-
-```json
-{ "message": "Data not found" }
-```
-
-**500 - Internal Server Error**
-
-```json
-{ "message": "Internal server error" }
+kelasku/
+├── server/                 # Backend API
+│   ├── controllers/        # Request handlers
+│   ├── models/            # Database models
+│   ├── routes/            # API routes
+│   ├── middlewares/       # Auth & error handling
+│   └── migrations/        # Database migrations
+└── client/                # Frontend React app
+    ├── src/
+    │   ├── components/    # Reusable components
+    │   ├── pages/         # Page components
+    │   ├── store/         # Redux store
+    │   └── utils/         # Helper functions
+    └── public/            # Static assets
 ```
